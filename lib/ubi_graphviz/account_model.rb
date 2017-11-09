@@ -2,11 +2,11 @@ module UbiGraphviz
   class AccountModel
     attr_reader :account, :code, :filename, :method_name
 
-    def initialize(account, filename: nil, method_name: nil, max_band_size: 5)
+    def initialize(account, filename: nil, method_name: nil, max_level: 5)
       @account = account
       @filename = filename || 'account_links'
       @method_name = method_name || :to_s
-      @max_band_size = max_band_size
+      @max_level = max_level
       build_dot_code
     end
 
@@ -32,8 +32,6 @@ module UbiGraphviz
         return
       end
       edges = parent_child_links.map { |link| build_edge(link) }
-      min_rank_names = parent_child_links.map(&:parent).find_all { |x| x.parents.empty? }.map(&:"#{method_name}")
-      max_rank_names = parent_child_links.map(&:child).find_all { |x| x.children.empty? }.map(&:"#{method_name}")
       @code = <<~EOH
         digraph g{
           #{account.public_send(method_name)}[
@@ -43,10 +41,20 @@ module UbiGraphviz
             layout = dot;
           ]
         #{edges.join}
-          { rank = min; #{min_rank_names.join(';')}; }
-          { rank = max; #{max_rank_names.join(';')}; }
+        #{rank}
         }
       EOH
+    end
+
+    def rank
+      min_rank_names = parent_child_links.map(&:parent).find_all { |x| x.parents.empty? }.map(&:"#{method_name}")
+      max_rank_names = parent_child_links.map(&:child).find_all { |x| x.children.empty? }.map(&:"#{method_name}")
+      if min_rank_names.present? && max_rank_names.present?
+        <<~EOH
+          { rank = min; #{min_rank_names.join(';')}; }
+          { rank = max; #{max_rank_names.join(';')}; }
+        EOH
+      end
     end
 
     def build_for_none_links
@@ -83,22 +91,23 @@ module UbiGraphviz
           list = [OpenStruct.new(child_id: account.id)]
           up_search(list)
         end
-      @max_band_size.times do
-        list = up_search(down_search(list, debug: nil), debug: false)
+      @max_level.times do
+        list = up_search(down_search(list))
       end
       down_search(list)
     end
 
-    def up_search(leaf, debug: false)
+    def up_search(leaf)
       local_roots = []
+      found_links = []
       may_roots = leaf.map { |p| OpenStruct.new(parent_id: p.child_id) }
-      binding.pry if debug
       loop do
-        # may_roots = may_roots.flat_map { |x| ParentChildLink.where(child_id: x.parent_id) }
         may_roots = ParentChildLink.where(child_id: may_roots.map(&:parent_id))
-        break if may_roots.empty?
+        # reject は 相互リンクだと無限ループになるのでそれを回避する
+        break if may_roots.reject{ |x|found_links.include?(x) }.empty?
         may_roots.each do |root_link|
-          if root_link.parent.parents.empty?
+          found_links << root_link
+          if root_link.parent.parent_links.reject{ |x|found_links.include?(x) }.empty?
             local_roots << root_link
           end
         end
@@ -106,15 +115,18 @@ module UbiGraphviz
       local_roots
     end
 
-    def down_search(roots, debug: false)
+    def down_search(roots)
       local_leaf = []
+      found_links = []
       may_leaf = roots.map { |p| OpenStruct.new(child_id: p.parent_id) }
-      binding.pry if debug
       loop do
         may_leaf = ParentChildLink.where(parent_id: may_leaf.map(&:child_id))
-        break if may_leaf.empty?
+        break if may_leaf.reject{ |x|found_links.include?(x) }.empty?
         may_leaf.each do |leaf_link|
-          local_leaf << leaf_link if leaf_link.child.children.empty?
+          found_links << leaf_link
+          if leaf_link.child.child_links.reject{ |x|found_links.include?(x) }.empty?
+            local_leaf << leaf_link
+          end
         end
       end
       local_leaf
@@ -125,12 +137,12 @@ module UbiGraphviz
       may_parent_links = leaf_links
       loop do
         may_parent_links = ParentChildLink.where(child_id: may_parent_links.map(&:parent_id))
-        break if may_parent_links.empty?
+        break if may_parent_links.reject { |x| parent_links.include?(x) }.empty?
         may_parent_links.each do |parent_link|
           parent_links << parent_link
         end
       end
-      parent_links.concat(leaf_links)
+      parent_links.concat(leaf_links).uniq
     end
   end
 end

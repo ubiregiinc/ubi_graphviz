@@ -5,7 +5,7 @@ RSpec.describe UbiGraphviz::AccountModel do
     #    parent
     #    ↑    ↑
     # child1  child2
-    #         ↑
+    #          ↑
     #         child1_child1
     it 'be success' do
       parent = FactoryBot.create(:blank_account, login: :parent)
@@ -34,8 +34,9 @@ RSpec.describe UbiGraphviz::AccountModel do
         "child2" -> "parent";
         "child1_child1" -> "child1";
 
-          { rank = min; parent;parent; }
-          { rank = max; child2;child1_child1; }
+        { rank = min; parent;parent; }
+        { rank = max; child2;child1_child1; }
+
         }
         EOF
       )
@@ -59,6 +60,12 @@ RSpec.describe UbiGraphviz::AccountModel do
   end
 
   describe '3層共通の親が1つ' do
+    #      parent2         parent1
+    #      ↑    ↑          ↑  ↑
+    #      |   child2_parent12   |
+    #      |         ↑          |
+    #      |     child4_child2   |
+    # child3_parent2      child1_parent1
     it 'be success' do
       parent1 = FactoryBot.create(:blank_account, login: :parent1)
       parent2 = FactoryBot.create(:blank_account, login: :parent2)
@@ -74,6 +81,66 @@ RSpec.describe UbiGraphviz::AccountModel do
       [parent1, parent2, child1_parent1, child2_parent12, child3_parent2, child4_child2].each do |account|
         ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
         expect(ubi_graphviz.parent_child_links.size).to eq(5)
+      end
+    end
+  end
+
+  describe '3層共通の親が1つ(一部相互リンク)' do
+    #      parent2         parent1
+    #      ↑    ↑          ↑  ↑
+    #      |   child2_parent12   |
+    #      |        ↑ ↓        |
+    #      |     child4_child2   |
+    # child3_parent2      child1_parent1
+    it 'be success' do
+      parent1 = FactoryBot.create(:blank_account, login: :parent1)
+      parent2 = FactoryBot.create(:blank_account, login: :parent2)
+      child1_parent1 = FactoryBot.create(:blank_account, login: :child1_parent1)
+      child2_parent12 = FactoryBot.create(:blank_account, login: :child2_parent12)
+      child3_parent2 = FactoryBot.create(:blank_account, login: :child3_parent2)
+      child4_child2 = FactoryBot.create(:blank_account, login: :child4_child2)
+      ParentChildLink.create!(parent: parent1, child: child1_parent1, child_name: 'child1_1', accepted: true)
+      ParentChildLink.create!(parent: parent1, child: child2_parent12, child_name: 'child2_parent1', accepted: true)
+      ParentChildLink.create!(parent: parent2, child: child2_parent12, child_name: 'child2_parent2', accepted: true)
+      ParentChildLink.create!(parent: parent2, child: child3_parent2, child_name: 'child3_parent2', accepted: true)
+      ParentChildLink.create!(parent: child2_parent12, child: child4_child2, child_name: 'child4_child2', accepted: true)
+      ParentChildLink.create!(parent: child4_child2, child: child2_parent12, child_name: 'child4_child2', accepted: true)
+      [parent1, parent2, child1_parent1, child2_parent12, child3_parent2, child4_child2].each do |account|
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz.write
+        expect(ubi_graphviz.parent_child_links.size).to eq(6)
+      end
+    end
+  end
+
+  describe '3層共通の親が1つ(全部相互リンク)' do
+    #       parent2         parent1
+    #      ↑|   ↑↓      ↓↑ | ↑
+    #      | | child2_parent12  | |
+    #      | |        ↑ ↓     | |
+    #      | ↓   child4_child2 ↓|
+    # child3_parent2      child1_parent1
+    it 'be success' do
+      parent1 = FactoryBot.create(:blank_account, login: :parent1)
+      parent2 = FactoryBot.create(:blank_account, login: :parent2)
+      child1_parent1 = FactoryBot.create(:blank_account, login: :child1_parent1)
+      child2_parent12 = FactoryBot.create(:blank_account, login: :child2_parent12)
+      child3_parent2 = FactoryBot.create(:blank_account, login: :child3_parent2)
+      child4_child2 = FactoryBot.create(:blank_account, login: :child4_child2)
+      ParentChildLink.create!(parent: parent1, child: child1_parent1, child_name: 'child1_1', accepted: true)
+      ParentChildLink.create!(parent: child1_parent1, child: parent1, child_name: 'child1_1', accepted: true)
+      ParentChildLink.create!(parent: parent1, child: child2_parent12, child_name: 'child2_parent1', accepted: true)
+      ParentChildLink.create!(parent: child2_parent12, child: parent1, child_name: 'child2_parent1', accepted: true)
+      ParentChildLink.create!(parent: parent2, child: child2_parent12, child_name: 'child2_parent2', accepted: true)
+      ParentChildLink.create!(parent: parent2, child: child3_parent2, child_name: 'child3_parent2', accepted: true)
+      ParentChildLink.create!(parent: child3_parent2, child: parent2, child_name: 'child3_parent2', accepted: true)
+      ParentChildLink.create!(parent: child2_parent12, child: parent2, child_name: 'child3_parent2', accepted: true)
+      ParentChildLink.create!(parent: child2_parent12, child: child4_child2, child_name: 'child4_child2', accepted: true)
+      ParentChildLink.create!(parent: child4_child2, child: child2_parent12, child_name: 'child4_child2', accepted: true)
+      [parent1, parent2, child1_parent1, child2_parent12, child3_parent2, child4_child2].each do |account|
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz.write
+        expect(ubi_graphviz.parent_child_links.size).to eq(10)
       end
     end
   end
@@ -103,7 +170,6 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: parent5, child: child5,child_name: 'parent5_child5', accepted: true)
       accounts.each do |account|
         ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
-        ubi_graphviz.write
         expect(ubi_graphviz.parent_child_links.size).to eq(9)
       end
     end
