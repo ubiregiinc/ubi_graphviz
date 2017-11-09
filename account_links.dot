@@ -1,0 +1,14 @@
+digraph g{
+  child[
+    style = "filled";
+  ]
+  graph[
+    layout = dot;
+  ]
+"child" -> "parent";
+"child" -> "parent";
+"child1_child1" -> "child";
+
+  { rank = min; parent;parent; }
+  { rank = max; child;child1_child1; }
+}
