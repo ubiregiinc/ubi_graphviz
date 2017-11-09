@@ -86,14 +86,11 @@ module UbiGraphviz
       list = 
         case 
         when account.parents.empty? && account.children.exists? # 一番親の時
-          list = [OpenStruct.new(parent_id: account.id)]
-          down_search(list)
+          down_search([OpenStruct.new(parent_id: account.id)])
         when account.parents.exists? && account.children.empty? # leafの時
-          list = [OpenStruct.new(child_id: account.id)]
-          up_search(list)
+          up_search([OpenStruct.new(child_id: account.id)])
         else # 中間
-          list = [OpenStruct.new(child_id: account.id)]
-          up_search(list)
+          up_search([OpenStruct.new(child_id: account.id)])
         end
       @max_level.times do
         list = up_search(down_search(list))
@@ -102,51 +99,51 @@ module UbiGraphviz
     end
 
     def up_search(leaf)
-      local_roots = []
+      roots = []
       found_links = []
-      may_roots = leaf.map { |p| OpenStruct.new(parent_id: p.child_id) }
+      maybe_roots = leaf.map { |p| OpenStruct.new(parent_id: p.child_id) }
       loop do
-        may_roots = ParentChildLink.where(child_id: may_roots.map(&:parent_id))
-        # reject は 相互リンクだと無限ループになるのでそれを回避する
-        break if may_roots.reject{ |x|found_links.include?(x) }.empty?
-        may_roots.each do |root_link|
-          found_links << root_link
-          if root_link.parent.parent_links.reject{ |x|found_links.include?(x) }.empty?
-            local_roots << root_link
+        maybe_roots = ParentChildLink.where(child_id: maybe_roots.map(&:parent_id))
+        # 相互リンクだと無限ループになるのでrejectして回避する
+        break if maybe_roots.reject{ |x|found_links.include?(x) }.empty?
+        maybe_roots.each do |maybe_root|
+          found_links << maybe_root
+          if maybe_root.parent.parent_links.reject{ |x|found_links.include?(x) }.empty?
+            roots << maybe_root
           end
         end
       end
-      local_roots
+      roots
     end
 
     def down_search(roots)
-      local_leaf = []
+      leafs = []
       found_links = []
-      may_leaf = roots.map { |p| OpenStruct.new(child_id: p.parent_id) }
+      maybe_leaf = roots.map { |p| OpenStruct.new(child_id: p.parent_id) }
       loop do
-        may_leaf = ParentChildLink.where(parent_id: may_leaf.map(&:child_id))
-        break if may_leaf.reject{ |x|found_links.include?(x) }.empty?
-        may_leaf.each do |leaf_link|
-          found_links << leaf_link
-          if leaf_link.child.child_links.reject{ |x|found_links.include?(x) }.empty?
-            local_leaf << leaf_link
+        maybe_leaf = ParentChildLink.where(parent_id: maybe_leaf.map(&:child_id))
+        break if maybe_leaf.reject{ |x|found_links.include?(x) }.empty?
+        maybe_leaf.each do |maybe_leaf|
+          found_links << maybe_leaf
+          if maybe_leaf.child.child_links.reject{ |x|found_links.include?(x) }.empty?
+            leafs << maybe_leaf
           end
         end
       end
-      local_leaf
+      leafs
     end
 
-    def collect_link(leaf_links)
-      parent_links = []
-      may_parent_links = leaf_links
+    def collect_link(leafs)
+      has_links = []
+      maybe_roots = leafs
       loop do
-        may_parent_links = ParentChildLink.where(child_id: may_parent_links.map(&:parent_id))
-        break if may_parent_links.reject { |x| parent_links.include?(x) }.empty?
-        may_parent_links.each do |parent_link|
-          parent_links << parent_link
+        maybe_roots = ParentChildLink.where(child_id: maybe_roots.map(&:parent_id))
+        break if maybe_roots.reject { |x| has_links.include?(x) }.empty?
+        maybe_roots.each do |root|
+          has_links << root
         end
       end
-      parent_links.concat(leaf_links).uniq
+      has_links.concat(leafs).uniq
     end
   end
 end

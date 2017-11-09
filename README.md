@@ -6,7 +6,7 @@ graphvizの静止画像を生成するにはdotを使います。
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'ubi_graphviz'
+gem 'ubi_graphviz', github: 'jiikko/ubi-graphviz'
 ```
 
 And then execute:
