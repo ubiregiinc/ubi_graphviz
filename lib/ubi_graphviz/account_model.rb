@@ -2,6 +2,10 @@ module UbiGraphviz
   class AccountModel
     attr_reader :account, :code, :filename, :method_name
 
+    # account: 探索を開始するAcocuntインスタンス
+    # filename: ファイルに保存する時にこの名前で保存する
+    # method_name: このメソッドの出力が画像にした時の1要素に表示するラベルの名前になる
+    # max_level: 探索しに幅. 兄弟が多い場合は大きくしないと開始するアカウントによっては拾い漏らしが起きる
     def initialize(account, filename: nil, method_name: nil, max_level: 5)
       @account = account
       @filename = filename || 'account_links'
