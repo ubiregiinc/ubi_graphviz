@@ -1,6 +1,9 @@
 # UbiGraphviz
 graphvizの静止画像を生成するにはdotを使います。
 
+## Requires
+dot / graphviz
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -26,12 +29,18 @@ ubi_graphviz.run_dot_command # dotコマンドが使ってtest.pngというフ�
 ```
 
 ### 出力例
+
 テストコードで記述している図
-![img](./images/2parent_3sou.png "img")
-![img](./images/all_mutal_lini_4sou.png "img")
-![img](./images/simple_3sou.png "img")
-![img](./images/simple_mutal_link.png "img")
-![img](./images/yoko_2sou.png "img")
+
+![img](./images/2parent_3sou.png "img")  
+
+![img](./images/all_mutal_lini_4sou.png "img")　　
+
+![img](./images/simple_3sou.png "img")　　
+
+![img](./images/simple_mutal_link.png "img")　　
+
+![img](./images/yoko_2sou.png "img")  
 
 ## License
 
