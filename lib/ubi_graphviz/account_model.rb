@@ -134,16 +134,16 @@ module UbiGraphviz
     end
 
     def collect_link(leafs)
-      has_links = []
+      found_links = []
       maybe_roots = leafs
       loop do
         maybe_roots = ParentChildLink.where(child_id: maybe_roots.map(&:parent_id))
-        break if maybe_roots.reject { |x| has_links.include?(x) }.empty?
+        break if maybe_roots.reject { |x| found_links.include?(x) }.empty?
         maybe_roots.each do |root|
-          has_links << root
+          found_links << root
         end
       end
-      has_links.concat(leafs).uniq
+      found_links.concat(leafs).uniq
     end
   end
 end
