@@ -2,10 +2,11 @@ module UbiGraphviz
   class AccountModel
     attr_reader :account, :code, :filename, :method_name
 
-    def initialize(account, filename: nil, method_name: nil)
+    def initialize(account, filename: nil, method_name: nil, max_band_size: 5)
       @account = account
       @filename = filename || 'account_links'
       @method_name = method_name || :to_s
+      @max_band_size = max_band_size
       build_dot_code
     end
 
@@ -27,7 +28,8 @@ module UbiGraphviz
 
     def build_dot_code
       if parent_child_links.size.zero?
-        return 
+        @code = build_for_none_links
+        return
       end
       edges = parent_child_links.map { |link| build_edge(link) }
       min_rank_names = parent_child_links.map(&:parent).find_all { |x| x.parents.empty? }.map(&:"#{method_name}")
@@ -43,6 +45,16 @@ module UbiGraphviz
         #{edges.join}
           { rank = min; #{min_rank_names.join(';')}; }
           { rank = max; #{max_rank_names.join(';')}; }
+        }
+      EOH
+    end
+
+    def build_for_none_links
+      <<~EOH
+        digraph g{
+          #{account.public_send(method_name)}[
+            style = "filled";
+          ]
         }
       EOH
     end
@@ -71,7 +83,7 @@ module UbiGraphviz
           list = [OpenStruct.new(child_id: account.id)]
           up_search(list)
         end
-      5.times do
+      @max_band_size.times do
         list = up_search(down_search(list, debug: nil), debug: false)
       end
       down_search(list)

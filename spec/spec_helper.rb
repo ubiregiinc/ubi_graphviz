@@ -3,6 +3,12 @@ require "ubi_graphviz"
 require "pry"
 require "active_record"
 
+conn = { adapter: "sqlite3", database: ":memory:" }
+ActiveRecord::Base.establish_connection(conn)
+
+require "support/models/account"
+require "support/models/parent_child_link"
+
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"

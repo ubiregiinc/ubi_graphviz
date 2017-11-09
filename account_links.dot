@@ -1,14 +1,20 @@
 digraph g{
-  child[
+  child5[
     style = "filled";
   ]
   graph[
     layout = dot;
   ]
-"child" -> "parent";
-"child" -> "parent";
-"child1_child1" -> "child";
+"child1" -> "parent1";
+"child2" -> "parent1";
+"child2" -> "parent2";
+"child3" -> "parent2";
+"child3" -> "parent3";
+"child4" -> "parent3";
+"child4" -> "parent4";
+"child5" -> "parent4";
+"child5" -> "parent5";
 
-  { rank = min; parent;parent; }
-  { rank = max; child;child1_child1; }
+  { rank = min; parent1;parent1;parent2;parent2;parent3;parent3;parent4;parent4;parent5; }
+  { rank = max; child1;child2;child2;child3;child3;child4;child4;child5;child5; }
 }
