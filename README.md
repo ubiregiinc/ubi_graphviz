@@ -4,6 +4,8 @@ graphvizの静止画像を生成するにはdotを使います。
 ## Requires
 dot / graphviz
 
+`brew install graphviz` で入ります
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -15,10 +17,6 @@ gem 'ubi_graphviz', github: 'jiikko/ubi_graphviz'
 And then execute:
 
     $ bundle
-
-Or install it yourself as:
-
-    $ gem install ubi_graphviz
 
 ## Usage
 ```ruby
