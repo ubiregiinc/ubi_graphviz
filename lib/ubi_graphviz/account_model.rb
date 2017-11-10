@@ -7,7 +7,12 @@ module UbiGraphviz
     # method_name: このメソッドの出力が画像にした時の1要素に表示するラベルの名前になる
     # max_level: 探索しに幅. 兄弟が多い場合は大きくしないと開始するアカウントによっては拾い漏らしが起きる
     def initialize(account, filename: nil, method_name: nil, max_level: 5)
-      @account = account
+      @account =
+        if account.is_a?(Integer)
+          Account.find(acocunt)
+        else
+          account
+        end
       @filename = filename || 'account_links'
       @method_name = method_name || :to_s
       @max_level = max_level
@@ -83,8 +88,8 @@ module UbiGraphviz
       if account.parents.empty? && account.children.empty?
         return []
       end
-      list = 
-        case 
+      list =
+        case
         when account.parents.empty? && account.children.exists? # 一番親の時
           down_search([OpenStruct.new(parent_id: account.id)])
         when account.parents.exists? && account.children.empty? # leafの時
