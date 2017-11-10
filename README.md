@@ -25,12 +25,13 @@ Or install it yourself as:
 account = FactoryBot.create(:blank_account, login: :parent)
 ubi_graphviz = UbiGraphviz::AccountModel.new(account, inspector: :id, filename: 'test')
 ubi_graphviz.write # test.dot というファイルに出力する
-ubi_graphviz.run_dot_command # dotコマンドが使ってtest.pngというファイル名で画像を出力する
+ubi_graphviz.render # dotコマンドが使ってtest.pngという画像を出力する
 ```
 
 ### 出力例
 #### テストコードで記述している図
-矢印は方向は、child => parent というの関係を表している。
+* 矢印は方向は、child => parent というの関係を表している
+* 網掛けになっている要素は、引数で渡ってきたアカウントを指している
 
 ![img](./images/2parent_3sou.png "img")  
 
