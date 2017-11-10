@@ -9,7 +9,7 @@ dot / graphviz
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'ubi_graphviz', github: 'jiikko/ubi-graphviz'
+gem 'ubi_graphviz', github: 'jiikko/ubi_graphviz'
 ```
 
 And then execute:
@@ -29,8 +29,8 @@ ubi_graphviz.run_dot_command # dotコマンドが使ってtest.pngというフ�
 ```
 
 ### 出力例
-
-テストコードで記述している図
+#### テストコードで記述している図
+矢印は方向は、child => parent というの関係を表している。
 
 ![img](./images/2parent_3sou.png "img")  
 
