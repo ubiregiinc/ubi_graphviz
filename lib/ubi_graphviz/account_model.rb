@@ -1,12 +1,12 @@
 module UbiGraphviz
   class AccountModel
-    attr_reader :account, :code, :filename, :method_name
+    attr_reader :account, :code, :filename
 
     # account: 探索を開始するAcocuntインスタンス
     # filename: ファイルに保存する時にこの名前で保存する
-    # method_name: このメソッドの出力が画像にした時の1要素に表示するラベルの名前になる
+    # inspector: このメソッドの出力が画像にした時の1要素に表示するラベルの名前になる. Proc or lamba or Symbol
     # max_level: 探索しに幅. 兄弟が多い場合は大きくしないと開始するアカウントによっては拾い漏らしが起きる
-    def initialize(account, filename: nil, method_name: nil, max_level: 5)
+    def initialize(account, filename: nil, inspector: nil, max_level: 5)
       @account =
         if account.is_a?(Integer)
           Account.find(acocunt)
@@ -14,7 +14,7 @@ module UbiGraphviz
           account
         end
       @filename = filename || 'account_links'
-      @method_name = method_name || :to_s
+      @inspect_block = inspector || ->(a){ "#{a.id}: #{a.login}" }
       @max_level = max_level
       build_dot_code
     end
@@ -36,14 +36,14 @@ module UbiGraphviz
     private
 
     def build_dot_code
-      if parent_child_links.size.zero?
+      if parent_child_links.empty?
         @code = build_for_none_links
         return
       end
       edges = parent_child_links.map { |link| build_edge(link) }
       @code = <<~EOH
         digraph g{
-          #{account.public_send(method_name)}[
+          "#{inspect(account)}"[
             style = "filled";
           ]
           graph[
@@ -57,9 +57,9 @@ module UbiGraphviz
 
     def rank
       min_rank_names = parent_child_links.map(&:parent).
-        find_all { |x| x.parents.empty? }.map { |x| "\"#{x.public_send(method_name)}\";" }
+        find_all { |x| x.parents.empty? }.map { |a| "\"#{inspect(a)}\";" }
       max_rank_names = parent_child_links.map(&:child).
-        find_all { |x| x.children.empty? }.map { |x| "\"#{x.public_send(method_name)}\";" }
+        find_all { |x| x.children.empty? }.map { |a| "\"#{inspect(a)}\";" }
       if min_rank_names.present? && max_rank_names.present?
         <<~EOH
           { rank = min; #{min_rank_names.join} }
@@ -71,7 +71,7 @@ module UbiGraphviz
     def build_for_none_links
       <<~EOH
         digraph g{
-          #{account.public_send(method_name)}[
+          #{inspect(account)}[
             style = "filled";
           ]
         }
@@ -79,11 +79,19 @@ module UbiGraphviz
     end
 
     def build_edge(parent_child_link)
-      child_name = parent_child_link.child.public_send(method_name)
-      parent_name = parent_child_link.parent.public_send(method_name)
+      child_name = inspect(parent_child_link.child)
+      parent_name = inspect(parent_child_link.parent)
       <<~EOH
         "#{child_name}" -> "#{parent_name}";
       EOH
+    end
+
+    def inspect(account)
+      if @inspect_block.is_a?(Symbol)
+        account.public_send(@inspect_block)
+      else
+        @inspect_block.call(account)
+      end
     end
 
     def get_leafs_links(account)

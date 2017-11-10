@@ -16,15 +16,16 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: parent, child: child2,child_name: 'parent_child2', accepted: true)
       ParentChildLink.create!(parent: child1, child: child1_child1, child_name: 'child1_child1', accepted: true)
       [parent, child1, child2, child1_child1].each do |account|
-        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account, inspector: :id)
+        ubi_graphviz.write.run_dot_command
         expect(ubi_graphviz.parent_child_links.size).to eq(3)
       end
-      ubi_graphviz = UbiGraphviz::AccountModel.new(child2, method_name: :login)
+      ubi_graphviz = UbiGraphviz::AccountModel.new(child2, inspector: :login)
       expect(ubi_graphviz.parent_child_links.size).to eq(3)
       expect(ubi_graphviz.code).to eq(
         <<~EOF
         digraph g{
-          child2[
+          "child2"[
             style = "filled";
           ]
           graph[
@@ -53,7 +54,7 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: account1, child: account2, child_name: 'child1_1', accepted: true)
       ParentChildLink.create!(parent: account2, child: account1, child_name: 'child2_parent1', accepted: true)
       [account1, account2].each do |account|
-        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account)
         expect(ubi_graphviz.parent_child_links.size).to eq(2)
       end
     end
@@ -79,7 +80,7 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: parent2, child: child3_parent2, child_name: 'child3_parent2', accepted: true)
       ParentChildLink.create!(parent: child2_parent12, child: child4_child2, child_name: 'child4_child2', accepted: true)
       [parent1, parent2, child1_parent1, child2_parent12, child3_parent2, child4_child2].each do |account|
-        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account)
         expect(ubi_graphviz.parent_child_links.size).to eq(5)
       end
     end
@@ -106,7 +107,7 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: child2_parent12, child: child4_child2, child_name: 'child4_child2', accepted: true)
       ParentChildLink.create!(parent: child4_child2, child: child2_parent12, child_name: 'child4_child2', accepted: true)
       [parent1, parent2, child1_parent1, child2_parent12, child3_parent2, child4_child2].each do |account|
-        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account)
         ubi_graphviz.write
         expect(ubi_graphviz.parent_child_links.size).to eq(6)
       end
@@ -138,7 +139,7 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: child2_parent12, child: child4_child2, child_name: 'child4_child2', accepted: true)
       ParentChildLink.create!(parent: child4_child2, child: child2_parent12, child_name: 'child4_child2', accepted: true)
       [parent1, parent2, child1_parent1, child2_parent12, child3_parent2, child4_child2].each do |account|
-        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account)
         ubi_graphviz.write
         expect(ubi_graphviz.parent_child_links.size).to eq(10)
       end
@@ -169,7 +170,7 @@ RSpec.describe UbiGraphviz::AccountModel do
       ParentChildLink.create!(parent: parent4, child: child5,child_name: 'parent4_child5', accepted: true)
       ParentChildLink.create!(parent: parent5, child: child5,child_name: 'parent5_child5', accepted: true)
       accounts.each do |account|
-        ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account)
         expect(ubi_graphviz.parent_child_links.size).to eq(9)
       end
     end
@@ -178,7 +179,7 @@ RSpec.describe UbiGraphviz::AccountModel do
   describe '親子なし' do
     it 'be success' do
       account = FactoryBot.create(:blank_account, login: :parent)
-      ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login)
+      ubi_graphviz = UbiGraphviz::AccountModel.new(account)
       expect(ubi_graphviz.parent_child_links.size).to eq(0)
     end
   end

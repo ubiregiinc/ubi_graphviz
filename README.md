@@ -23,7 +23,7 @@ Or install it yourself as:
 ## Usage
 ```ruby
 account = FactoryBot.create(:blank_account, login: :parent)
-ubi_graphviz = UbiGraphviz::AccountModel.new(account, method_name: :login, filename: 'test')
+ubi_graphviz = UbiGraphviz::AccountModel.new(account, inspector: :id, filename: 'test')
 ubi_graphviz.write # test.dot というファイルに出力する
 ubi_graphviz.run_dot_command # dotコマンドが使ってtest.pngというファイル名で画像を出力する
 ```
