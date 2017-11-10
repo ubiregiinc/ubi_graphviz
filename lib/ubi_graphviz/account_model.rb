@@ -17,23 +17,30 @@ module UbiGraphviz
       @inspect_block = inspector || ->(a){ "#{a.id}: #{a.login}" }
       @max_level = max_level
       build_dot_code
+      FileUtils.rm_rf(dot_filename) if File.exists?(dot_filename)
     end
 
-    def write
-      path = [filename, '.dot'].join
-      File.write(path, @code)
+    def write_dotfile
+      File.write(dot_filename, @code)
       self
     end
+    alias write write_dotfile
 
     def run_dot_command
+      write_dotfile if !File.exists?(dot_filename)
       system("dot ./#{filename}.dot -Tpng -o ./#{filename}.png")
     end
+    alias render run_dot_command
 
     def parent_child_links
       @parent_child_links ||= collect_link(get_leafs_links(account))
     end
 
     private
+
+    def dot_filename
+      [filename, '.dot'].join
+    end
 
     def build_dot_code
       if parent_child_links.empty?
