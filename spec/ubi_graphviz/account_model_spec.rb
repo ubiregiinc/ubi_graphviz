@@ -34,8 +34,8 @@ RSpec.describe UbiGraphviz::AccountModel do
         "child2" -> "parent";
         "child1_child1" -> "child1";
 
-        { rank = min; parent;parent; }
-        { rank = max; child2;child1_child1; }
+        { rank = min; "parent";"parent"; }
+        { rank = max; "child2";"child1_child1"; }
 
         }
         EOF

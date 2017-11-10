@@ -56,12 +56,14 @@ module UbiGraphviz
     end
 
     def rank
-      min_rank_names = parent_child_links.map(&:parent).find_all { |x| x.parents.empty? }.map(&:"#{method_name}")
-      max_rank_names = parent_child_links.map(&:child).find_all { |x| x.children.empty? }.map(&:"#{method_name}")
+      min_rank_names = parent_child_links.map(&:parent).
+        find_all { |x| x.parents.empty? }.map { |x| "\"#{x.public_send(method_name)}\";" }
+      max_rank_names = parent_child_links.map(&:child).
+        find_all { |x| x.children.empty? }.map { |x| "\"#{x.public_send(method_name)}\";" }
       if min_rank_names.present? && max_rank_names.present?
         <<~EOH
-          { rank = min; #{min_rank_names.join(';')}; }
-          { rank = max; #{max_rank_names.join(';')}; }
+          { rank = min; #{min_rank_names.join} }
+          { rank = max; #{max_rank_names.join} }
         EOH
       end
     end
