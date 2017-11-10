@@ -33,7 +33,10 @@ module UbiGraphviz
     alias render run_dot_command
 
     def parent_child_links
-      @parent_child_links ||= collect_link(get_leafs_links(account))
+      # 無限ループが発生した時のためにタイムアウトを設定する
+      Timeout.timeout(5) do
+        @parent_child_links ||= collect_link(get_leafs_links(account))
+      end
     end
 
     private
