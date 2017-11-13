@@ -9,7 +9,7 @@ module UbiGraphviz
     def initialize(account, filename: nil, inspector: nil, max_level: 5)
       @account =
         if account.is_a?(Integer)
-          Account.find(acocunt)
+          Account.find(account)
         else
           account
         end

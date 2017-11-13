@@ -176,7 +176,7 @@ RSpec.describe UbiGraphviz::AccountModel do
   describe '親子なし' do
     it 'be success' do
       account = FactoryBot.create(:blank_account, login: :parent)
-      ubi_graphviz = UbiGraphviz::AccountModel.new(account)
+      ubi_graphviz = UbiGraphviz::AccountModel.new(account.id)
       expect(ubi_graphviz.parent_child_links.size).to eq(0)
     end
   end
