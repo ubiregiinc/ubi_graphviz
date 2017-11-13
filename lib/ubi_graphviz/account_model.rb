@@ -155,7 +155,7 @@ module UbiGraphviz
         maybe_leaf.each do |maybe_leaf|
           found_links << maybe_leaf
           next if maybe_leaf.child.nil?
-          if maybe_leaf.child.child_links.reject{ |x|found_links.include?(x) }.empty?
+          if maybe_leaf.child.child_links.where(accepted: true).reject{ |x|found_links.include?(x) }.empty?
             leafs << maybe_leaf
           end
         end
@@ -168,7 +168,7 @@ module UbiGraphviz
       maybe_roots = leafs
       loop do
         maybe_roots = ParentChildLink.where(child_id: maybe_roots.map(&:parent_id))
-        break if maybe_roots.reject { |x| found_links.include?(x) }.empty?
+        break if maybe_roots.where(accepted: true).reject { |x| found_links.include?(x) }.empty?
         maybe_roots.each do |root|
           found_links << root
         end
