@@ -44,6 +44,28 @@ RSpec.describe UbiGraphviz::AccountModel do
   end
 
   describe '2層親子で相互' do
+    it 'be success' do
+      accounts = [
+        parent = FactoryBot.create(:blank_account, login: :parent),
+        child1 = FactoryBot.create(:blank_account, login: :child1),
+        child2 = FactoryBot.create(:blank_account, login: :child2),
+        child3 = FactoryBot.create(:blank_account, login: :child3),
+        child4 = FactoryBot.create(:blank_account, login: :child4),
+        child5 = FactoryBot.create(:blank_account, login: :child5),
+      ]
+      ParentChildLink.create!(parent: parent, child: child1, child_name: 'c', accepted: true)
+      ParentChildLink.create!(parent: parent, child: child2, child_name: 'c', accepted: true)
+      ParentChildLink.create!(parent: parent, child: child3, child_name: 'c', accepted: true)
+      ParentChildLink.create!(parent: parent, child: child4, child_name: 'c', accepted: true)
+      ParentChildLink.create!(parent: parent, child: child5, child_name: 'c', accepted: true)
+      accounts.each do |account|
+        ubi_graphviz = UbiGraphviz::AccountModel.new(account)
+        expect(ubi_graphviz.parent_child_links.size).to eq(5)
+      end
+    end
+  end
+
+  describe '2層親子で相互' do
     #    account1
     #      ↑ ↓
     #    account2

@@ -6,7 +6,7 @@ module UbiGraphviz
     # filename: ファイルに保存する時にこの名前で保存する
     # inspector: このメソッドの出力が画像にした時の1要素に表示するラベルの名前になる. Proc or lamba or Symbol
     # max_level: 探索しに幅. 兄弟が多い場合は大きくしないと開始するアカウントによっては拾い漏らしが起きる
-    def initialize(account, filename: nil, inspector: nil, max_level: 5)
+    def initialize(account, filename: nil, inspector: nil, max_level: 5, debug: false)
       @account =
         if account.is_a?(Integer)
           Account.find(account)
@@ -18,6 +18,9 @@ module UbiGraphviz
       @max_level = max_level
       build_dot_code
       FileUtils.rm_rf(dot_filename) if File.exists?(dot_filename)
+      parent_child_links.each do |link|
+        puts "child: #{link.child_id} parent: #{link.parent_id}"
+      end if debug
     end
 
     def write_dotfile
