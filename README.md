@@ -34,15 +34,15 @@ ubi_graphviz.render # dotコマンドが使ってtest.pngという画像を出�
 * `account1 => account2` という関係の場合、`acocunt1`のparentが`acocnut2`となる
 * 網掛けになっている要素は引数で渡したアカウントを指している
 
-![img](./images/2parent_3sou.png "img")  
+![img](https://github.com/jiikko/ubi_graphviz/blob/img/images/2parent_3sou.png "img")
 
-![img](./images/all_mutal_lini_4sou.png "img")　　
+![img](https://github.com/jiikko/ubi_graphviz/blob/img/images/all_mutal_lini_4sou.png "img")　　
 
-![img](./images/simple_3sou.png "img")　　
+![img](https://github.com/jiikko/ubi_graphviz/blob/img/images/simple_3sou.png "img")　　
 
-![img](./images/simple_mutal_link.png "img")　　
+![img](https://github.com/jiikko/ubi_graphviz/blob/img/images/simple_mutal_link.png "img")　　
 
-![img](./images/yoko_2sou.png "img")  
+![img](https://github.com/jiikko/ubi_graphviz/blob/img/images/yoko_2sou.png "img")
 
 ## License
 
