@@ -8,7 +8,7 @@ module UbiGraphviz
     # max_level: 探索しに幅. 兄弟が多い場合は大きくしないと開始するアカウントによっては拾い漏らしが起きる
     def initialize(account, filename: nil, inspector: nil, max_level: 5, debug: false)
       @account =
-        if account.is_a?(Integer)
+        if account.is_a?(Integer) || account.is_a?(String)
           Account.find(account)
         else
           account
