@@ -28,6 +28,7 @@ RSpec.describe UbiGraphviz::AccountModel do
             style = "filled";
           ]
           graph[
+            rankdir=TB;
             layout = dot;
           ]
         "child1" -> "parent";
@@ -40,6 +41,40 @@ RSpec.describe UbiGraphviz::AccountModel do
         }
         EOF
       )
+    end
+
+    context 'rankdirを指定している時' do
+      it 'rankdirが出力されること' do
+        parent = FactoryBot.create(:blank_account, login: :parent)
+        child1 = FactoryBot.create(:blank_account, login: :child1)
+        child2 = FactoryBot.create(:blank_account, login: :child2)
+        child1_child1 = FactoryBot.create(:blank_account, login: :child1_child1)
+        ParentChildLink.create!(parent: parent, child: child1,child_name: 'parent_child1', accepted: true)
+        ParentChildLink.create!(parent: parent, child: child2,child_name: 'parent_child2', accepted: true)
+        ParentChildLink.create!(parent: child1, child: child1_child1, child_name: 'child1_child1', accepted: true)
+        ubi_graphviz = UbiGraphviz::AccountModel.new(child2, inspector: :login, rankdir: 'rl')
+        expect(ubi_graphviz.parent_child_links.size).to eq(3)
+        expect(ubi_graphviz.code).to eq(
+          <<~EOF
+          digraph g{
+            "child2"[
+              style = "filled";
+            ]
+            graph[
+              rankdir=RL;
+              layout = dot;
+            ]
+          "child1" -> "parent";
+          "child2" -> "parent";
+          "child1_child1" -> "child1";
+
+          { rank = min; "parent";"parent"; }
+          { rank = max; "child2";"child1_child1"; }
+
+          }
+          EOF
+        )
+      end
     end
   end
 
