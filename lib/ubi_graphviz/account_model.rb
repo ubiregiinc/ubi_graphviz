@@ -6,7 +6,7 @@ module UbiGraphviz
     # filename: ファイルに保存する時にこの名前で保存する
     # inspector: このメソッドの出力が画像にした時の1要素に表示するラベルの名前になる. Proc or lamba or Symbol
     # max_level: 探索しに幅. 兄弟が多い場合は大きくしないと開始するアカウントによっては拾い漏らしが起きる
-    def initialize(account, filename: nil, inspector: nil, max_level: 5, debug: false)
+    def initialize(account, filename: nil, inspector: nil, max_level: 5, debug: false, timeout: 5)
       @account =
         if account.is_a?(Integer) || account.is_a?(String)
           Account.find(account)
@@ -16,6 +16,7 @@ module UbiGraphviz
       @filename = filename || 'account_links'
       @inspect_block = inspector || ->(a){ "#{a.id}: #{a.login}" }
       @max_level = max_level
+      @timeout = timeout
       build_dot_code
       FileUtils.rm_rf(dot_filename) if File.exists?(dot_filename)
       parent_child_links.each do |link|
@@ -37,7 +38,7 @@ module UbiGraphviz
 
     def parent_child_links
       # 無限ループが発生した時のためにタイムアウトを設定する
-      Timeout.timeout(5) do
+      Timeout.timeout(@timeout) do
         @parent_child_links ||= collect_link(get_leafs_links(account))
       end
     end
