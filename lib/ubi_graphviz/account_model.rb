@@ -1,6 +1,6 @@
 module UbiGraphviz
   class AccountModel
-    attr_reader :account, :code, :filename
+    attr_reader :code, :filename
 
     # account: 探索を開始するAcocuntインスタンス
     # filename: ファイルに保存する時にこの名前で保存する
@@ -39,7 +39,7 @@ module UbiGraphviz
     def parent_child_links
       # 無限ループが発生した時のためにタイムアウトを設定する
       Timeout.timeout(@timeout) do
-        @parent_child_links ||= collect_link(get_leafs_links(account))
+        @parent_child_links ||= collect_link(get_leafs_links(@account))
       end
     end
 
@@ -57,7 +57,7 @@ module UbiGraphviz
       edges = parent_child_links.map { |link| build_edge(link) }
       @code = <<~EOH
         digraph g{
-          "#{inspect(account)}"[
+          "#{inspect(@account)}"[
             style = "filled";
           ]
           graph[
@@ -85,7 +85,7 @@ module UbiGraphviz
     def build_for_none_links
       <<~EOH
         digraph g{
-          #{inspect(account)}[
+          "#{inspect(@account)}"[
             style = "filled";
           ]
         }
