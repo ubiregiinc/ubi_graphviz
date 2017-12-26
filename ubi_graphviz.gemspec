@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["jiikko"]
   spec.email         = ["n905i.1214@gmail.com"]
 
-  spec.summary       = %q{DOT言語のコードを生成します.}
+  spec.summary       = %q{Generate code of DOT language.}
   spec.description   = spec.summary
   spec.homepage      = "https://github.com/jiikko/ubi-graphviz"
   spec.license       = "MIT"
