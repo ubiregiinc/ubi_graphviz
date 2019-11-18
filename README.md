@@ -1,6 +1,6 @@
 # UbiGraphviz
 * このgemはなんらかのデータ構造を画像に出力します
-  * dotコマンドを使います
+  * dotコマンドを使います
 
 ## 対応しているモデル
 * Account
@@ -27,7 +27,7 @@ And then execute:
 account = FactoryBot.create(:blank_account, login: :parent)
 ubi_graphviz = UbiGraphviz::AccountModel.new(account, inspector: :id, filename: 'test')
 ubi_graphviz.write # test.dot というファイルに出力する
-ubi_graphviz.render # dotコマンドが使ってtest.pngという画像を出力する
+ubi_graphviz.render # dotコマンドを使ってtest.pngという画像を出力する
 ```
 
 ### 出力例
