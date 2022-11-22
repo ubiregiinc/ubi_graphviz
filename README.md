@@ -30,6 +30,11 @@ ubi_graphviz.write # test.dot というファイルに出力する
 ubi_graphviz.render # dotコマンドを使ってtest.pngという画像を出力する
 ```
 
+## Development
+* docker compose run --rm app bash
+* bundle install
+* bundle exec rake
+
 ### 出力例
 * `account1 => account2` という関係の場合、`acocunt1`のparentが`acocnut2`となる
 * 網掛けになっている要素は引数で渡したアカウントを指している

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - './:/app:delegated'
+      - bundle_path:/bundle
+    environment:
+      - BUNDLE_PATH=/bundle
+volumes:
+  bundle_path:
