@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = spec.summary
   spec.homepage      = "https://github.com/jiikko/ubi-graphviz"
   spec.license       = "MIT"
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
@@ -21,9 +22,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "sqlite3"
-  spec.add_development_dependency "activerecord", "~> 5.0"
+  spec.add_development_dependency "activerecord", "~> 7.0"
 end
