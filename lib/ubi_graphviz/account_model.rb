@@ -20,7 +20,7 @@ module UbiGraphviz
       @timeout = timeout
       @rankdir = rankdir || 'TB'
       build_dot_code
-      FileUtils.rm_rf(dot_filename) if File.exists?(dot_filename)
+      FileUtils.rm_rf(dot_filename) if File.exist?(dot_filename)
       parent_child_links.each do |link|
         puts "child: #{link.child_id} parent: #{link.parent_id}"
       end if debug
@@ -33,7 +33,7 @@ module UbiGraphviz
     alias write write_dotfile
 
     def run_dot_command
-      write_dotfile if !File.exists?(dot_filename)
+      write_dotfile if !File.exist?(dot_filename)
       system("dot ./#{filename}.dot -Tpng -o ./#{filename}.png")
     end
     alias render run_dot_command
